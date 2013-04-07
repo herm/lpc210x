@@ -15,14 +15,6 @@ RUN_MODE=ROM_RUN
 ## Create RAM-Image (debugging)
 #RUN_MODE=RAM_RUN
 
-
-# Output format. (can be srec, ihex, binary)
-FORMAT = binary
-
-
-# Target file name (without extension).
-TARGET = main
-
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 SRC = system/system.c
@@ -50,7 +42,7 @@ CPPSRCARM =
 ASRC = 
 ASRCARM = system/crt0.S
 
-OPT = s
+OPT = 3
 DEBUG = 3
 
 # List any extra directories to look for include files here.
@@ -86,7 +78,7 @@ ADEFS =  -D$(RUN_MODE)
 CFLAGS = -g$(DEBUG)
 CFLAGS += $(CDEFS) $(CINCS)
 CFLAGS += -O$(OPT)
-CFLAGS += -Wall -Wcast-align -Wcast-qual -Wimplicit #-fno-inline
+CFLAGS += -Wall -Wcast-align -Wcast-qual -Wimplicit -Winline #-fno-inline
 CFLAGS += -Wpointer-arith -Wswitch
 CFLAGS += -Wredundant-decls -Wreturn-type -Wshadow -Wunused
 #CFLAGS += -Wa,-adhlns=$(<:.c=.lst) 
@@ -189,31 +181,26 @@ ALL_ASFLAGS = -mcpu=$(MCU) $(THUMB_IW) -I. -x assembler-with-cpp $(ASFLAGS)
 
 
 # Default target.
-all: sizebefore build sizeafter
+all: sizebefore build sizeafter debug/main-checksum.bin
 
-build: elf hex lss sym
+build: elf bin lss sym
 
 elf: debug/main.elf
-hex: debug/main.hex
+bin: debug/main.bin
 lss: debug/main.lss
 sym: debug/main.sym
 
 # Display size of file.
-HEXSIZE = $(SIZE) --target=$(FORMAT) $(TARGET).hex
 ELFSIZE = $(SIZE) -A $(TARGET).elf
 sizebefore:
 	@if [ -f debug/main.elf ]; then cp debug/main.elf debug/main.old; fi
 
 sizeafter:
-	echo "WARNING: getsize.py doesn't support new filename scheme yet!"
 	@$(SIZE) debug/main.elf
 
 
 # Program the device.  
-program: all hex
-	@dd bs=1 count=20 if=debug/main.hex of=debug/main.bin 2>/dev/null
-	@/bin/echo -n -e "\\0236\\0117\\0300\\0264" >> debug/main.bin
-	@dd bs=1 seek=24 skip=24 if=debug/main.hex of=debug/main.bin 2>/dev/null
+program: all debug/main_checksum.bin
 	@openocd -f system/flash.cfg -c program_flash -c shutdown
 
 debug:
@@ -225,10 +212,6 @@ ddd:
 
 reset:
 	@openocd -f system/flash.cfg -c reset run -c shutdown
-
-# Create final output files (.hex, .eep) from ELF output file.
-%.hex: %.elf
-	$(Q)$(OBJCOPY) -O $(FORMAT) $< $@
 
 
 # Create extended listing file from ELF output file.
@@ -334,7 +317,7 @@ build elf hex lss sym clean clean_list program debug
 %.bin: %.elf
 	$(Q)$(OBJCOPY) -O binary $< $@
 	
-debug/main-checksum.bin: main.bin
-	dd bs=1 count=20 if=main.bin of=debug/main-checksum.bin 2>/dev/null
-	/bin/echo -n -e "\\0236\\0117\\0300\\0264" >> debug/main-checksum.bin
-	dd bs=1 seek=24 skip=24 if=main.bin of=debug/main-checksum.bin 2>/dev/null
+debug/main-checksum.bin: debug/main.bin
+	@dd bs=1 count=20 if=debug/main.bin of=debug/main-checksum.bin 2>/dev/null
+	@/bin/echo -n -e "\\0236\\0117\\0300\\0264" >> debug/main-checksum.bin
+	@dd bs=1 seek=24 skip=24 if=debug/main.bin of=debug/main-checksum.bin 2>/dev/null

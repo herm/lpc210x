@@ -131,17 +131,18 @@ _mainCRTStartup:
    Call C++ constructors (for objects in "global scope")
    ctor loop added by Martin Thomas 4/2005 
    based on a Anglia Design example-application for ST ARM
+   Updated by Hermann Kraus to work with init_array
 */
 
-		LDR 	r0, =__ctors_start__
-		LDR 	r1, =__ctors_end__
+		LDR 	r0, = __init_array_start
+		LDR 	r1, = __init_array_end
 ctor_loop:
 		CMP 	r0, r1
 		BEQ 	ctor_end
 		LDR 	r2, [r0], #4
 		STMFD 	sp!, {r0-r1}
 		MOV 	lr, pc
-		MOV 	pc, r2
+		BX      r2
 		LDMFD 	sp!, {r0-r1}
 		B 		ctor_loop
 ctor_end:

@@ -22,15 +22,15 @@ SRC = system/system.c
 
 # List C source files here which must be compiled in ARM-Mode.
 # use file-extension c for "c-only"-files
-SRCARM = system/vic.c
+SRCARM = system/vic.c libdcc/dcc_stdio.c  system/delay.c
 
 # List C++ source files here.
 # use file-extension cpp for C++-files
-CPPSRC = main.cpp
+CPPSRC = main.cpp nrf24l01.cpp
 
 # List C++ source files here which must be compiled in ARM-Mode.
 # use file-extension cpp for C++-files
-CPPSRCARM = 
+CPPSRCARM =
 
 # List Assembler source files here.
 # Make them always end in a capital .S.  Files ending in a lowercase .s
@@ -42,7 +42,7 @@ CPPSRCARM =
 ASRC = 
 ASRCARM = system/crt0.S
 
-OPT = 3
+OPT = s
 DEBUG = 3
 
 # List any extra directories to look for include files here.
@@ -84,8 +84,9 @@ CFLAGS += -Wredundant-decls -Wreturn-type -Wshadow -Wunused
 #CFLAGS += -Wa,-adhlns=$(<:.c=.lst) 
 CFLAGS += -Wa,-adhlns=$(subst $(suffix $<),.lst,$<) 
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
-CFLAGS += -ffunction-sections
-CFLAGS += -fno-exceptions
+CFLAGS += -ffunction-sections -funit-at-a-time #-fdata-sections
+CFLAGS += -fno-exceptions -fno-default-inline -finline-limit=100 -fno-threadsafe-statics
+CFLAGS += -fmerge-all-constants -ffast-math #Dangerous?
 
 # flags only for C
 #-Wmissing-prototypes -Wmissing-declarations
@@ -116,11 +117,12 @@ MATH_LIB = -lm
 #  -Wl,...:     tell GCC to pass this to linker.
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
-LDFLAGS = -nostartfiles -Wl,-Map=debug/main.map,--cref
-LDFLAGS += -lc
+LDFLAGS = -nostartfiles
+LDFLAGS += -Wl,-Map=debug/main.map,--cref
+LDFLAGS += -lc -funit-at-a-time
 LDFLAGS += $(NEWLIBLPC) $(MATH_LIB)
-LDFLAGS += -lc -lgcc
-#LDFLAGS += -Wl,--gc-sections
+LDFLAGS += -lc -lgcc -lstdc++
+LDFLAGS += -Wl,--gc-sections
 
 # Set Linker-Script Depending On Selected Memory
 ifeq ($(RUN_MODE),RAM_RUN)
@@ -191,7 +193,6 @@ lss: debug/main.lss
 sym: debug/main.sym
 
 # Display size of file.
-ELFSIZE = $(SIZE) -A $(TARGET).elf
 sizebefore:
 	@if [ -f debug/main.elf ]; then cp debug/main.elf debug/main.old; fi
 
@@ -200,12 +201,15 @@ sizeafter:
 
 
 # Program the device.  
-program: all debug/main_checksum.bin
+program: all debug/main-checksum.bin
 	@openocd -f system/flash.cfg -c program_flash -c shutdown
+
+messages:
+	@openocd -f system/flash.cfg -c request_debug -c resume
 
 debug:
 	cp debug/main.elf debug/debug.elf
-	@openocd -f system/flash.cfg
+	@openocd -f system/flash.cfg -c request_debug
 
 ddd:
 	ddd --debugger arm-none-eabi-gdb
@@ -297,17 +301,17 @@ clean:
 # Include the dependency files.
 -include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
 
-mmap: $(TARGET).elf
-	$(Q)$(NM) -C -S -r --radix=d --size-sort $(TARGET).elf > $(TARGET).mmap.size
-	$(Q)echo "upper: GLOBAL lower: local, B: BSS, D: Ram, T: code" > $(TARGET).smmap
-	$(Q)cat $(TARGET).mmap.size | egrep -i "\ t\ " >> $(TARGET).smmap || true
-	$(Q)cat $(TARGET).mmap.size | egrep -i "\ d\ " >> $(TARGET).smmap || true
-	$(Q)cat $(TARGET).mmap.size | egrep -i "\ b\ " >> $(TARGET).smmap || true
-	$(Q)rm $(TARGET).mmap.size
-	$(Q)$(NM) -C -S --radix=d --numeric-sort $(TARGET).elf > $(TARGET).mmap.loc
-	$(Q)cat $(TARGET).mmap.loc | egrep -i "\ t\ " > $(TARGET).lmmap || true
-	$(Q)cat $(TARGET).mmap.loc | egrep -i "\ d\ " >> $(TARGET).lmmap || true
-	$(Q)cat $(TARGET).mmap.loc | egrep -i "\ b\ " >> $(TARGET).lmmap || true
+mmap: debug/main.elf
+	$(Q)$(NM) -C -S -r --radix=d --size-sort debug/main.elf > debug/mmap.size
+	$(Q)echo "upper: GLOBAL lower: local, B: BSS, D: Ram, T: code" > debug/size_map
+	$(Q)cat debug/mmap.size | egrep -i "\ t\ " >> debug/size_map || true
+	$(Q)cat debug/mmap.size | egrep -i "\ d\ " >> debug/size_map || true
+	$(Q)cat debug/mmap.size | egrep -i "\ b\ " >> debug/size_map || true
+	$(Q)rm debug/mmap.size
+	$(Q)$(NM) -C -S --radix=d --numeric-sort debug/main.elf > debug/mmap.loc
+	$(Q)cat debug/mmap.loc | egrep -i "\ t\ " >  debug/loc_map || true
+	$(Q)cat debug/mmap.loc | egrep -i "\ d\ " >> debug/loc_map || true
+	$(Q)cat debug/mmap.loc | egrep -i "\ b\ " >> debug/loc_map || true
 
 
 # Listing of phony targets.

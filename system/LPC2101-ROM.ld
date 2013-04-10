@@ -29,27 +29,31 @@ SECTIONS
   } > ROM
 
   . = ALIGN(4);
-  
-	/* .ctors .dtors are used for c++ constructors/destructors */
-	/* added by Martin Thomas 4/2005 based on Anglia Design example */
-	.ctors :
-	{
-		PROVIDE(__ctors_start__ = .);
-		KEEP(*(SORT(.ctors.*)))
-		KEEP(*(.ctors))
-		PROVIDE(__ctors_end__ = .);
-	} >ROM
-	
-	.dtors :
-	{
-		PROVIDE(__dtors_start__ = .); 
-		KEEP(*(SORT(.dtors.*)))
-		KEEP(*(.dtors))
-		PROVIDE(__dtors_end__ = .);
-	} >ROM
-  
+  .preinit_array     :
+  {
+    PROVIDE_HIDDEN (__preinit_array_start = .);
+    KEEP (*(.preinit_array))
+    PROVIDE_HIDDEN (__preinit_array_end = .);
+  } > ROM
+  .init_array     :
+  {
+    PROVIDE_HIDDEN (__init_array_start = .);
+    KEEP (*(SORT(.init_array.*)))
+    KEEP (*(.init_array))
+    KEEP(*(SORT(.ctors.*)))
+    KEEP(*(.ctors))
+    PROVIDE_HIDDEN (__init_array_end = .);
+  } > ROM
+  /* Destructors aren't usefull in an embedded system.
+  .fini_array     :
+  {
+    PROVIDE_HIDDEN (__fini_array_start = .);
+    KEEP (*(SORT(.fini_array.*)))
+    KEEP (*(.fini_array))
+    PROVIDE_HIDDEN (__fini_array_end = .);
+  } > ROM
+  */
     . = ALIGN(4);
-	/* mthomas - end */
   
   
   _etext = . ;

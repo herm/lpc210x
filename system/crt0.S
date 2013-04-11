@@ -126,7 +126,11 @@ _mainCRTStartup:
 2:      cmp   r1,r2                     // check if data to clear
         strlo r0,[r1],#4                // clear 4 bytes
         blo   2b                        // loop until done
-		
+
+/* Make sure system is configured before running constructors. */
+ bl	_Z9gpio_initv
+ bl	_Z11system_initv
+
 /*
    Call C++ constructors (for objects in "global scope")
    ctor loop added by Martin Thomas 4/2005 

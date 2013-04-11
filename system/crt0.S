@@ -128,8 +128,8 @@ _mainCRTStartup:
         blo   2b                        // loop until done
 
 /* Make sure system is configured before running constructors. */
- bl	_Z9gpio_initv
- bl	_Z11system_initv
+ bl	gpio_init
+ bl	system_init
 
 /*
    Call C++ constructors (for objects in "global scope")

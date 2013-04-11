@@ -1,8 +1,10 @@
 #ifndef __VIC_H__
 #define __VIC_H__
+extern "C" {
 unsigned enableIRQ(void);
 unsigned disableIRQ(void);
 unsigned restoreIRQ(unsigned oldCPSR);
+}
 
 #define vic_configure(channel, source, handler) \
 	do { \

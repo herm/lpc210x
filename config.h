@@ -6,7 +6,7 @@
 #define MAM
 
 /* osc freq */
-#define FOSC		10000000
+#define FOSC		SET_CORRECT_VALUE
 #define APBDIVIDER	1
 
 #define PLL_M		1
@@ -39,6 +39,6 @@
 #define pin_func(pin, function) ((function) << (((pin) & 0x0f)*2))
 #define default_PINSEL0 0
 #define default_PINSEL1 0
-#define default_PIN     0x0
+#define default_PIN     SET_AT_LEAST_ONE_OUTPUT
 #define default_DIR     0
 #endif

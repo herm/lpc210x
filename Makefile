@@ -207,6 +207,9 @@ program: all debug/main-checksum.bin
 messages:
 	@openocd -f system/flash.cfg -c request_debug -c resume
 
+pm:
+	@openocd -f system/flash.cfg -c request_debug -c program_flash
+
 debug:
 	cp debug/main.elf debug/debug.elf
 	@openocd -f system/flash.cfg -c request_debug

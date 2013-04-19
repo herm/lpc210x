@@ -2,9 +2,4 @@
 *.lst
 *~
 .dep/
-*.config
-*.creator
-*.files
-*.includes
-dep/
 debug/

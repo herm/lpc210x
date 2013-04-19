@@ -17,6 +17,7 @@ cp -i $modulename/config.template config.h
 cp -i $modulename/main.template main.cpp
 cp -i $modulename/Makefile.template Makefile
 cp -i $modulename/.gitignore .gitignore
+echo '#' > Makefile.modules
 mkdir debug
-git add config.h main.cpp Makefile .gitignore
+git add config.h main.cpp Makefile .gitignore Makefile.modules
 git commit -m "Created new project"

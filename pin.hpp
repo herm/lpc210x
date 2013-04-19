@@ -2,7 +2,8 @@
 #define PIN_HPP
 
 #include <inttypes.h>
-#include <system/inline.hpp>
+#include "lpc2103.h"
+#include "inline.hpp"
 
 #define pin_mask(pin)  (1<<(pin))
 #define pin_func(pin, function) ((function) << (((pin) & 0x0f)*2))

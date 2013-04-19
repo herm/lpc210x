@@ -128,7 +128,6 @@ _mainCRTStartup:
         blo   2b                        // loop until done
 
 /* Make sure system is configured before running constructors. */
- bl	gpio_init
  bl	system_init
 
 /*

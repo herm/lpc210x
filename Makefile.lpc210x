@@ -25,7 +25,7 @@ DEBUG = 3
 
 # List any extra directories to look for include files here.
 #     Each directory must be seperated by a space.
-EXTRAINCDIRS = $(SYSTEMDIR)
+EXTRAINCDIRS += $(SYSTEMDIR)
 
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
@@ -56,7 +56,7 @@ ADEFS =  -D$(RUN_MODE)
 CFLAGS = -g$(DEBUG)
 CFLAGS += $(CDEFS) $(CINCS)
 CFLAGS += -O$(OPT)
-CFLAGS += -Wall -Wcast-align -Wcast-qual -Wimplicit -Winline #-fno-inline
+CFLAGS += -Wall -Wcast-align -Wcast-qual -Wimplicit #-fno-inline
 CFLAGS += -Wpointer-arith -Wswitch
 CFLAGS += -Wredundant-decls -Wreturn-type -Wshadow -Wunused
 #CFLAGS += -Wa,-adhlns=$(<:.c=.lst) 

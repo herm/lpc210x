@@ -1,7 +1,7 @@
 #ifndef SPI_HPP
 #define SPI_HPP
 #include <inttypes.h>
-#include <system/inline.hpp>
+#include "inline.hpp"
 
 class SPI
 {

@@ -1,5 +1,5 @@
 #include "config.h"
-#include "../lpc2103.h"
+#include "lpc2103.h"
 #include "system.h"
 
 void system_init(void)

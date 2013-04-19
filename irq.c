@@ -4,7 +4,7 @@
  * May be used for hobby or commercial purposes provided copyright
  * notice remains intact. */
 
-#include "vic.h"
+#include "irq.h"
 
 #define IRQ_MASK 0x00000080
 

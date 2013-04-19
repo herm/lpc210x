@@ -14,4 +14,4 @@ PROGRAMMER = lm3s811
 ###################################################################
 SYSTEMDIR = lpc210x
 -include Makefile.modules
-include $(SYSTEMDIR)/Makefile.lpc210x
+include $(SYSTEMDIR)/Makefile.module

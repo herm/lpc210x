@@ -1,0 +1,16 @@
+MCU = LPC2101
+Q = @
+OPT = s
+
+SRC =
+CPPSRC = main.cpp
+ASRC =
+
+SRCARM =
+CPPSRCARM =
+ASRCARM =
+
+PROGRAMMER = lm3s811
+###################################################################
+SYSTEMDIR = lpc210x
+include $(SYSTEMDIR)/Makefile.lpc210x

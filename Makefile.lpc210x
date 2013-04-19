@@ -1,53 +1,31 @@
+SRC += $(SYSTEMDIR)/system.c
+CPPSRC +=
+ASRC +=
+
+SRCARM += $(SYSTEMDIR)/delay.c $(SYSTEMDIR)/vic.c
+CPPSRCARM +=
+ASRCARM += $(SYSTEMDIR)/crt0.S
+#################################################################################################
+
 # based on the WinAVR makefile written by Martin Thomas, Eric B. Weddington, Jörg Wunsch, et al.
 # Released to the Public Domain
 
 
 # MCU name and submodel
-MCU = arm7tdmi
-SUBMDL = LPC2101
+MCU_CLASS = arm7tdmi
 THUMB    = -mthumb
 THUMB_IW = -mthumb-interwork
-Q =
-Q = @
 
 ## Create ROM-Image (final)
 RUN_MODE=ROM_RUN
 ## Create RAM-Image (debugging)
 #RUN_MODE=RAM_RUN
 
-# List C source files here. (C dependencies are automatically generated.)
-# use file-extension c for "c-only"-files
-SRC = system/system.c
-#system/mystdio.c
-
-# List C source files here which must be compiled in ARM-Mode.
-# use file-extension c for "c-only"-files
-SRCARM = system/vic.c libdcc/dcc_stdio.c  system/delay.c
-
-# List C++ source files here.
-# use file-extension cpp for C++-files
-CPPSRC = main.cpp nrf24l01.cpp
-
-# List C++ source files here which must be compiled in ARM-Mode.
-# use file-extension cpp for C++-files
-CPPSRCARM =
-
-# List Assembler source files here.
-# Make them always end in a capital .S.  Files ending in a lowercase .s
-# will not be considered source files but generated files (assembler
-# output from the compiler), and will be deleted upon "make clean"!
-# Even though the DOS/Win* filesystem matches both .s and .S the same,
-# it will preserve the spelling of the filenames, and gcc itself does
-# care about< how the name is spelled on its command-line.
-ASRC = 
-ASRCARM = system/crt0.S
-
-OPT = s
 DEBUG = 3
 
 # List any extra directories to look for include files here.
 #     Each directory must be seperated by a space.
-EXTRAINCDIRS = ./system
+EXTRAINCDIRS = $(SYSTEMDIR)
 
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
@@ -126,9 +104,9 @@ LDFLAGS += -Wl,--gc-sections
 
 # Set Linker-Script Depending On Selected Memory
 ifeq ($(RUN_MODE),RAM_RUN)
-LINKERSCRIPT = system/$(SUBMDL)-RAM.ld
+LINKERSCRIPT = $(SYSTEMDIR)/$(MCU)-RAM.ld
 else
-LINKERSCRIPT = system/$(SUBMDL)-ROM.ld
+LINKERSCRIPT = $(SYSTEMDIR)/$(MCU)-ROM.ld
 endif
 LDFLAGS +=-T$(LINKERSCRIPT)
 
@@ -178,8 +156,8 @@ GENDEPFLAGS = -MD -MP -MF .dep/$(@F).d
 
 # Combine all necessary flags and optional flags.
 # Add target processor to flags.
-ALL_CFLAGS = -mcpu=$(MCU) $(THUMB_IW) -I. $(CFLAGS) $(GENDEPFLAGS)
-ALL_ASFLAGS = -mcpu=$(MCU) $(THUMB_IW) -I. -x assembler-with-cpp $(ASFLAGS)
+ALL_CFLAGS = -mcpu=$(MCU_CLASS) $(THUMB_IW) -I. $(CFLAGS) $(GENDEPFLAGS)
+ALL_ASFLAGS = -mcpu=$(MCU_CLASS) $(THUMB_IW) -I. -x assembler-with-cpp $(ASFLAGS)
 
 
 # Default target.
@@ -202,23 +180,23 @@ sizeafter:
 
 # Program the device.  
 program: all debug/main-checksum.bin
-	@openocd -f system/flash.cfg -c program_flash -c shutdown
+	@openocd -f $(SYSTEMDIR)/flash.cfg -c program_flash -c shutdown
 
 messages:
-	@openocd -f system/flash.cfg -c request_debug -c resume
+	@openocd -f $(SYSTEMDIR)/flash.cfg -c request_debug -c resume
 
 pm: debug/main-checksum.bin
-	@openocd -f system/flash.cfg -c request_debug -c program_flash
+	@openocd -f $(SYSTEMDIR)/flash.cfg -c request_debug -c program_flash
 
 debug:
 	cp debug/main.elf debug/debug.elf
-	@openocd -f system/flash.cfg -c request_debug
+	@openocd -f $(SYSTEMDIR)/flash.cfg -c request_debug
 
 ddd:
 	ddd --debugger arm-none-eabi-gdb
 
 reset:
-	@openocd -f system/flash.cfg -c reset run -c shutdown
+	@openocd -f $(SYSTEMDIR)/flash.cfg -c reset run -c shutdown
 
 
 # Create extended listing file from ELF output file.

@@ -12,11 +12,11 @@
 class DigitalOut
 {
 public:
-    explicit DigitalOut(uint32_t pinnr) : bitmask_(1 << pinnr) { FIODIR |= bitmask_; }
+    explicit DigitalOut(uint32_t pinnr, bool init = false) : bitmask_(1 << pinnr) { if (init) FIODIR |= bitmask_; }
     void low() const { FIOCLR = bitmask_;}
     void high() const { FIOSET = bitmask_;}
     force_inline void operator=(int value) const { if (value) FIOSET = bitmask_; else FIOCLR = bitmask_; }
-    force_inline operator int() const { return FIOPIN & bitmask_ ? 1 : 0; }
+    force_inline operator int() const { return FIOPIN & bitmask_; }
 private:
     const uint32_t bitmask_;
 };

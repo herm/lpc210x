@@ -2,7 +2,7 @@ SRC += $(SYSTEMDIR)/system.c
 CPPSRC +=
 ASRC +=
 
-SRCARM += $(SYSTEMDIR)/delay.c $(SYSTEMDIR)/irq.c $(SYSTEMDIR)/dcc_stdio.c
+SRCARM += $(SYSTEMDIR)/delay.c $(SYSTEMDIR)/irq.c $(SYSTEMDIR)/debug.c
 CPPSRCARM +=
 ASRCARM += $(SYSTEMDIR)/crt0.S
 #################################################################################################

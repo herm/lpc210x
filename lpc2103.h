@@ -73,6 +73,10 @@
 #define BIT30 (1<<30)
 #define BIT31 (1<<31)
 
+typedef volatile unsigned char  LPC_REG8  __attribute__ ((aligned (4)));
+typedef volatile unsigned short LPC_REG16 __attribute__ ((aligned (4)));
+typedef volatile unsigned long  LPC_REG32 __attribute__ ((aligned (4)));
+
 /* Vectored Interrupt Controller (VIC) */
 #define VICIRQStatus	(*((volatile unsigned long *) 0xFFFFF000))
 #define VICFIQStatus	(*((volatile unsigned long *) 0xFFFFF004))
@@ -134,6 +138,33 @@
 #define FIOPIN		(*((volatile unsigned long *) 0x3FFFC014))
 #define FIOSET		(*((volatile unsigned long *) 0x3FFFC018))
 #define FIOCLR		(*((volatile unsigned long *) 0x3FFFC01C))
+
+#define RBR RBR_THR_DLL
+#define THR RBR_THR_DLL
+#define DLL RBR_THR_DLL
+#define IER IER_DLM
+#define DLM IER_DLM
+#define IIR IIR_FCR
+#define FCR IIR_FCR
+typedef struct
+{
+    LPC_REG8  RBR_THR_DLL; //0x00
+    LPC_REG8  IER_DLM;     //0x04
+    LPC_REG8  IIR_FCR;     //0x08
+    LPC_REG8  LCR;         //0x0c
+    LPC_REG8  MCR;         //0x10
+    LPC_REG8  LSR;         //0x14
+    LPC_REG8  MSR;         //0x18
+    LPC_REG8  SCR;         //0x1c
+    LPC_REG32 ACR;         //0x20
+    LPC_REG8  unused1;     //0x24
+    LPC_REG8  FDR;         //0x28
+    LPC_REG8  unused2;     //0x2c
+    LPC_REG8  TER;         //0x2c
+} lpc_uart;
+
+#define lpc_uart0   (*((lpc_uart *)0xE000C000))
+#define lpc_uart1   (*((lpc_uart *)0xE0010000))
 
 /* Universal Asynchronous Receiver/Transmitter 0 (UART0) */
 #define U0RBR		(*((volatile unsigned char *) 0xE000C000)) /* rx buffer reg. (R/O when DLAB=0) */

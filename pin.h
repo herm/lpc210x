@@ -12,14 +12,32 @@
 class DigitalOut
 {
 public:
-    explicit DigitalOut(uint32_t pinnr, bool init = false) : bitmask_(1 << pinnr) { if (init) FIODIR |= bitmask_; }
+    explicit DigitalOut(uint32_t pinnr, bool init=true) : bitmask_(1 << pinnr) { if (init) FIODIR |= bitmask_; }
     void low() const { FIOCLR = bitmask_;}
     void high() const { FIOSET = bitmask_;}
     force_inline void operator=(int value) const { if (value) FIOSET = bitmask_; else FIOCLR = bitmask_; }
     force_inline operator int() const { return FIOPIN & bitmask_; }
-private:
+protected:
     const uint32_t bitmask_;
 };
 
+typedef enum {
+    PullNone,
+//    PullUp,   //Unsupported
+//    PullDown, //Unsupported
+    OpenDrain, //Emulated
+    _Output = 0x80
+} PinMode;
+#warning "Incomplete DigitalInOut support!"
+class DigitalInOut : public DigitalOut
+{
+public:
+    explicit DigitalInOut(uint32_t pinnr) : DigitalOut(pinnr, false)
+    {
+        FIODIR &= ~bitmask_;
+    }
+    void operator=(int value) const;
+    void mode(PinMode pull) const;
+};
 
 #endif // PIN_HPP

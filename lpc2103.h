@@ -491,6 +491,12 @@
 #define TEMT				BIT6
 #define RXFE				BIT7
 
+#define AUTOBAUD_START      BIT0
+#define AUTOBAUD_MODE       BIT1
+#define AUTOBAUD_RESTART    BIT2
+#define AUTOBAUD_END_IRQ    BIT8
+#define AUTOBAUD_TIMEOUT_IRQ BIT9
+
 #define IRQ_data_ready        BIT0
 #define IRQ_transmitter_ready BIT1
 #define IRQ_status_line       BIT2

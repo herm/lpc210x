@@ -1,6 +1,8 @@
 #include "lpc2103.h"
 #include "config.h"
-#include "vic.h"
+#include "irq.h"
+#include "pin.h"
+#include "delay.h"
 #include <inttypes.h>
 
 int main(void)

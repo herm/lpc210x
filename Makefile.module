@@ -1,4 +1,4 @@
-SRC += $(SYSTEMDIR)/system.c
+SRCARM += $(SYSTEMDIR)/system.c
 CPPSRC +=
 ASRC +=
 
